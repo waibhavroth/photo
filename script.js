@@ -31,8 +31,10 @@ function element(tag, className, value) {
 }
 
 // Upload a photo
+
 uploadForm.addEventListener("submit", async (e) => {
   e.preventDefault();
+  e.stopPropagation();
 
   const author = document.getElementById("authorName").value.trim();
   const caption = document.getElementById("caption").value.trim();
@@ -44,7 +46,7 @@ uploadForm.addEventListener("submit", async (e) => {
   if (!author || !file) return;
 
   if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
-    status.textContent = "Please choose a JPG, PNG or WebP image.";
+    status.textContent = "Please select a valid image.";
     return;
   }
 
@@ -54,17 +56,17 @@ uploadForm.addEventListener("submit", async (e) => {
   }
 
   btn.disabled = true;
-  status.textContent = "Uploading your photo...";
+  status.textContent = "Uploading photo...";
 
   try {
     const extension = file.type.split("/")[1];
     const filePath = `${crypto.randomUUID()}.${extension}`;
 
+    // Upload image to Supabase Storage
     const { error: storageError } = await db.storage
       .from("photos")
       .upload(filePath, file, {
-        contentType: file.type,
-        upsert: false
+        contentType: file.type
       });
 
     if (storageError) throw storageError;
@@ -73,6 +75,7 @@ uploadForm.addEventListener("submit", async (e) => {
       .from("photos")
       .getPublicUrl(filePath);
 
+    // Save post details
     const { error: postError } = await db
       .from("posts")
       .insert({
@@ -83,9 +86,12 @@ uploadForm.addEventListener("submit", async (e) => {
 
     if (postError) throw postError;
 
-    status.textContent = "Photo shared successfully! 🎉";
+    // Clear form without reloading
     uploadForm.reset();
 
+    status.textContent = "🎉 Photo uploaded successfully!";
+
+    // Refresh only the photo feed
     await loadPhotos();
 
   } catch (error) {
@@ -95,6 +101,7 @@ uploadForm.addEventListener("submit", async (e) => {
     btn.disabled = false;
   }
 });
+
 
 // Load all photos
 async function loadPhotos() {
