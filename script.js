@@ -170,32 +170,47 @@ async function createPhotoCard(post) {
     `${myLike ? "❤️" : "🤍"} Like (${likeCount || 0})`
   );
 
-  likeBtn.addEventListener("click", async () => {
-    likeBtn.disabled = true;
+  
+likeBtn.addEventListener("click", async (e) => {
+  e.preventDefault();
+  e.stopPropagation();
 
-    try {
-      if (myLike) {
-        const { error } = await db.from("likes")
-          .delete()
-          .eq("id", myLike.id);
+  likeBtn.disabled = true;
 
-        if (error) throw error;
-      } else {
-        const { error } = await db.from("likes")
-          .insert({
-            post_id: post.id,
-            visitor_id: visitorId
-          });
+  try {
+    if (myLike) {
+      const { error } = await db
+        .from("likes")
+        .delete()
+        .eq("id", myLike.id);
 
-        if (error) throw error;
-      }
+      if (error) throw error;
 
-      await loadPhotos();
-    } catch (error) {
-      alert(error.message);
-      likeBtn.disabled = false;
+      likeBtn.textContent = `🤍 Like (${Math.max(0, (likeCount || 0) - 1)})`;
+      likeBtn.classList.remove("liked");
+
+    } else {
+      const { error } = await db
+        .from("likes")
+        .insert({
+          post_id: post.id,
+          visitor_id: visitorId
+        });
+
+      if (error) throw error;
+
+      likeBtn.textContent = `❤️ Like (${(likeCount || 0) + 1})`;
+      likeBtn.classList.add("liked");
     }
-  });
+
+  } catch (error) {
+    console.error("Like error:", error);
+    alert(error.message);
+  } finally {
+    likeBtn.disabled = false;
+  }
+});
+
 
   info.append(likeBtn);
 
