@@ -1,0 +1,59 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Waibhav - Share Your Moments</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+  <header class="navbar">
+    <h1>📸 waibhav</h1>
+    <p>Share your beautiful moments</p>
+  </header>
+
+  <main class="container">
+
+    <section class="upload-card">
+      <h2>✨ Share a Moment</h2>
+      <form id="uploadForm">
+        <input type="text" id="authorName"
+          placeholder="Your name" maxlength="40" required>
+
+        <textarea id="caption"
+          placeholder="Write something about your photo..."
+          maxlength="500"></textarea>
+
+        <label class="file-label" for="photoInput">
+          📷 Choose a photo
+        </label>
+
+        <input type="file" id="photoInput"
+          accept="image/jpeg,image/png,image/webp" required>
+
+        <button type="submit" id="uploadBtn">
+          Share Photo 🚀
+        </button>
+        <p id="uploadStatus"></p>
+      </form>
+    </section>
+
+    <section class="feed-section">
+      <h2>🌈 Explore Photos</h2>
+      <div id="photoFeed" class="photo-grid">
+        <p>Loading photos...</p>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    Made with ❤️ waibhav
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
